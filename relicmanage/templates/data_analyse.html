@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>数据分析</title>
+  <link rel="stylesheet" href="../static/layui/css/layui.css">
+  <style>
+    .layui-body{
+      left:300px;
+      margin-top: 50px;
+    }
+    .layui-table{
+      width: 400px;
+    }
+  </style>
+            <script type="text/javascript" src="https://assets.pyecharts.org/assets/echarts.min.js"></script>
+            <script type="text/javascript" src="https://assets.pyecharts.org/assets/echarts-wordcloud.min.js"></script>
+            <script type="text/javascript" src="https://assets.pyecharts.org/assets/echarts.min.js"></script>
+            <script type="text/javascript" src="https://assets.pyecharts.org/assets/echarts-wordcloud.min.js"></script>
+            <script type="text/javascript" src="https://assets.pyecharts.org/assets/maps/china-cities.js"></script>
+
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+  <div class="layui-header">
+    <div class="layui-logo">后台管理系统</div>
+    <!-- 头部区域（可配合layui已有的水平导航） -->
+
+
+    <ul class="layui-nav layui-layout-right">
+      <li class="layui-nav-item">
+        <a href="javascript:;">
+          <img src="../static/img/head.png" class="layui-nav-img">
+          {{ user.username }}
+        </a>
+        <dl class="layui-nav-child">
+          <dd><a href="">基本资料</a></dd>
+          <dd><a href="">安全设置</a></dd>
+        </dl>
+      </li>
+      <li class="layui-nav-item"><a id="logout" href="/logout/">退出</a></li>
+    </ul>
+  </div>
+
+  <div class="layui-side layui-bg-black">
+    <div class="layui-side-scroll">
+      <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+      <ul class="layui-nav layui-nav-tree"  lay-filter="test">
+
+        <li class="layui-nav-item">
+          <a class="" href="../user_list">用户管理</a>
+        </li>
+
+        <li class="layui-nav-item">
+          <a href="../relic_list/">文物管理</a>
+        </li>
+
+        <li class="layui-nav-item layui-nav-itemed">
+          <a href="javascript:;">资源管理</a>
+          <dl class="layui-nav-child">
+            <dd class=""><a href="../photo_list">照片管理</a></dd>
+            <dd><a href="../video_list">视频管理</a></dd>
+          </dl>
+        </li>
+
+        <li class="layui-nav-item layui-this"><a href="../data_analyse">数据分析</a></li>
+
+      </ul>
+    </div>
+  </div>
+
+  <div class="layui-body">
+    <!-- 内容主体区域 -->
+    <div class="layui-upload">
+<!--          预测博物馆人流量-->
+          <div id="4aab6b2376444298badd86e0e95ec6ef" class="chart-container" style="width:600px; height:260px;"></div>
+<!--          性别占比-->
+          <div id="sex_rate" class="chart-container" style="width:450px; height:250px; padding-top:50px; padding-left:90px; "></div>
+<!--            文物类型柱状图-->
+            <div id="7202048f92894320ae26d14d9c3c5a5f" class="chart-container" style="width:400px; height:300px; padding-left:90px; margin-top:50px;"></div>
+<!--      文物热度词云图-->
+          <div id="relic_word" class="chart-container" style="width:450px; height:250px; padding-top:50px; padding-left:90px; margin-bottom:50px;"></div>
+<!--          游客来源地图-->
+            <div id="389a10b14f354985a8377f473555d931" class="chart-container" style="width:700px; height:350px; margin-bottom: 100px;"></div>
+
+      </div>
+
+  <div class="layui-footer">
+    <!-- 底部固定区域 -->
+    © yd_shi
+  </div>
+</div>
+<script type="text/javascript" src="../static/layui/layui.js" charset="utf-8"></script>
+  <script>
+
+    var chartDom = document.getElementById('sex_rate');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    var man_num = {{ man_num }};
+    var woman_num = {{ woman_num }};
+
+    option = {
+        title:{
+            text:'浙江省博物馆人流量男女占比情况',
+            "left": "center",
+        },
+        tooltip: {
+            trigger: 'item'
+        },
+        legend: {
+            top: '18%',
+            left: 'right'
+        },
+        series: [
+            {
+                name: '男女占比',
+                type: 'pie',
+                radius: ['40%', '70%'],
+                avoidLabelOverlap: false,
+                itemStyle: {
+                    borderRadius: 10,
+                    borderColor: '#fff',
+                    borderWidth: 2
+                },
+                label: {
+                    show: false,
+                    position: 'center'
+                },
+                emphasis: {
+                    label: {
+                        show: true,
+                        fontSize: '40',
+                        fontWeight: 'bold'
+                    }
+                },
+                labelLine: {
+                    show: false
+                },
+                data: [
+                    {value: man_num, name: '男'},
+                    {value: woman_num, name: '女'},
+                ]
+            }
+        ]
+    };
+    myChart.setOption(option);
+  </script>
+    <script>
+    var type_name = {{ type_name|safe }};
+    var type_num = {{ type_num|safe }};
+    console.log(type_name);
+    var chart_7202048f92894320ae26d14d9c3c5a5f = echarts.init(
+        document.getElementById('7202048f92894320ae26d14d9c3c5a5f'), 'white', {renderer: 'canvas'});
+    var option_7202048f92894320ae26d14d9c3c5a5f = {
+    "series": [
+        {
+            "type": "bar",
+            "name": "\u6587\u7269\u6570\u91cf",
+            "legendHoverLink": true,
+            "data": type_num,
+            "showBackground": false,
+            "barMinHeight": 0,
+            "barCategoryGap": "60%",
+            "barGap": "30%",
+            "label": {
+                "show": true,
+                "position": "top",
+                "margin": 8
+            },
+            "itemStyle": {
+                "normal": {
+                    "color": new echarts.graphic.LinearGradient(0, 0, 0, 1, [{                offset: 0,                color: 'rgba(0, 244, 255, 1)'            }, {                offset: 1,                color: 'rgba(0, 77, 167, 1)'            }], false),
+                    "barBorderRadius": [
+                        30,
+                        30,
+                        30,
+                        30
+                    ],
+                    "shadowColor": "rgb(0, 160, 221)"
+                }
+            },
+        }
+    ],
+    "legend": [
+        {
+            "data": [
+                "\u6587\u7269\u6570\u91cf"
+            ],
+            "selected": {
+                "\u6587\u7269\u6570\u91cf": true
+            },
+            "show": true,
+            "left": "right",
+        }
+    ],
+    "tooltip": {
+        "show": true,
+        "trigger": "item",
+        "triggerOn": "mousemove|click",
+        "axisPointer": {
+            "type": "line"
+        },
+        "showContent": true,
+        "alwaysShowContent": false,
+        "showDelay": 0,
+        "hideDelay": 100,
+        "textStyle": {
+            "fontSize": 14
+        },
+        "borderWidth": 0,
+        "padding": 5
+    },
+    "xAxis": [
+        {
+            "show": true,
+            "scale": false,
+            "nameLocation": "end",
+            "nameGap": 15,
+            "gridIndex": 0,
+            "inverse": false,
+            "offset": 0,
+            "splitNumber": 5,
+            "minInterval": 0,
+            "splitLine": {
+                "show": false,
+                "lineStyle": {
+                    "show": true,
+                    "width": 1,
+                    "opacity": 1,
+                    "curveness": 0,
+                    "type": "solid"
+                }
+            },
+            "data": type_name
+        }
+    ],
+    "yAxis": [
+        {
+            "show": true,
+            "scale": false,
+            "nameLocation": "end",
+            "nameGap": 15,
+            "gridIndex": 0,
+            "inverse": false,
+            "offset": 0,
+            "splitNumber": 5,
+            "minInterval": 0,
+            "splitLine": {
+                "show": false,
+                "lineStyle": {
+                    "show": true,
+                    "width": 1,
+                    "opacity": 1,
+                    "curveness": 0,
+                    "type": "solid"
+                }
+            }
+        }
+    ],
+    "title": [
+        {
+            "text": "\u6587\u7269\u7c7b\u522b\u6570\u91cf",
+            "left": "center",
+            "padding": 5,
+            "itemGap": 10
+        }
+    ]
+};
+        chart_7202048f92894320ae26d14d9c3c5a5f.setOption(option_7202048f92894320ae26d14d9c3c5a5f);
+    </script>
+  <script>
+
+    var chartDom = document.getElementById('relic_word');
+    var relicChart = echarts.init(chartDom);
+    var option_relic;
+
+    var relicname_list = {{ relicname_list|safe }};
+    var hot_list = {{ hot_list|safe }};
+    var relic_list = {{ relic_list|safe }};
+    console.log(relic_list);
+
+    var relic_list_new = [];
+    for (var i = 0; i < relic_list.length; i++) {
+        relic_list_new.push({
+            name: relic_list[i][0],
+            value: relic_list[i][1]
+        });
+    }
+    console.log(relic_list_new);
+
+
+    var chart_aefb6ca94c384a4392250385f3f719f2 = echarts.init(document.getElementById('relic_word'), 'white', {renderer: 'canvas'});
+    var option_aefb6ca94c384a4392250385f3f719f2 = {
+    "animation": true,
+    "animationThreshold": 2000,
+    "animationDuration": 1000,
+    "animationEasing": "cubicOut",
+    "animationDelay": 0,
+    "animationDurationUpdate": 300,
+    "animationEasingUpdate": "cubicOut",
+    "animationDelayUpdate": 0,
+
+    tooltip: {
+        show: true
+    },
+    "series": [
+        {
+            "type": "wordCloud",
+            "name": "\u70ed\u70b9\u5206\u6790",
+            "shape": "circle",
+            "rotationRange": [
+                -45,
+                90
+            ],
+            "rotationStep": 45,
+            "textRotation": [0, 45, 60, -45],
+            "girdSize": 20,
+            "sizeRange": [
+                15,
+                40
+            ],
+            "data": relic_list_new,
+            "drawOutOfBound": false,
+            "textStyle": {
+                normal: {
+                    color: function() {//文字颜色的随机色
+                        return 'rgb(' + [
+                            Math.round(Math.random() * 250),
+                            Math.round(Math.random() * 250),
+                            Math.round(Math.random() * 250)
+                        ].join(',') + ')';
+                    }
+                },
+            },
+        }
+    ],
+    "legend": [
+        {
+            "data": [],
+            "selected": {},
+            "show": true,
+            "left": "left",
+            "padding": 5,
+            "itemGap": 10,
+            "itemWidth": 25,
+            "itemHeight": 14
+        }
+    ],
+    "tooltip": {
+        "show": true,
+        "trigger": "item",
+        "triggerOn": "mousemove|click",
+        "axisPointer": {
+            "type": "line"
+        },
+        "showContent": true,
+        "alwaysShowContent": false,
+        "showDelay": 0,
+        "hideDelay": 100,
+        "textStyle": {
+            "fontSize": 14
+        },
+        "borderWidth": 0,
+        "padding": 5
+    },
+    "title": [
+        {
+            "text": "\u6587\u7269\u70ed\u5ea6\u8bcd\u4e91\u56fe",
+            "left": "center",
+            "padding": 5,
+            "itemGap": 10,
+            "textStyle": {
+                "fontSize": 18
+            }
+        }
+    ]
+};
+        chart_aefb6ca94c384a4392250385f3f719f2.setOption(option_aefb6ca94c384a4392250385f3f719f2);
+    </script>
+  <script>
+      var data = {{ city_set|safe }};
+      console.log(data);
+      var citynames = Object.keys(data);
+      var convertData = function (data) {
+          var res = [];
+          for (var i = 0; i < citynames.length; i++) {
+              res.push({
+                  name: citynames[i],
+                  value: data[citynames[i]]
+              });
+          }
+          return res;
+      };
+
+      data_new = convertData(data);
+      console.log(data_new);
+
+      var chart_389a10b14f354985a8377f473555d931 = echarts.init(document.getElementById('389a10b14f354985a8377f473555d931'), 'white', {renderer: 'canvas'});
+
+      var option_389a10b14f354985a8377f473555d931 = {
+      "animation": true,
+      "animationThreshold": 2000,
+      "animationDuration": 1000,
+      "animationEasing": "cubicOut",
+      "animationDelay": 0,
+      "animationDurationUpdate": 300,
+      "animationEasingUpdate": "cubicOut",
+      "animationDelayUpdate": 0,
+      "color": [
+          "#c23531",
+          "#2f4554",
+          "#61a0a8",
+          "#d48265",
+          "#749f83",
+          "#ca8622",
+          "#bda29a",
+          "#6e7074",
+          "#546570",
+          "#c4ccd3",
+          "#f05b72",
+          "#ef5b9c",
+          "#f47920",
+          "#905a3d",
+          "#fab27b",
+          "#2a5caa",
+          "#444693",
+          "#726930",
+          "#b2d235",
+          "#6d8346",
+          "#ac6767",
+          "#1d953f",
+          "#6950a1",
+          "#918597"
+      ],
+      "series": [
+          {
+              "type": "map",
+              "name": "\u57ce\u5e02",
+              "label": {
+                  "show": false,
+                  "position": "top",
+                  "margin": 8
+              },
+              "mapType": "china-cities",
+              "data": data_new,
+              "roam": true,
+              "aspectScale": 0.75,
+              "nameProperty": "name",
+              "selectedMode": false,
+              "zoom": 1,
+              "mapValueCalculation": "sum",
+              "showLegendSymbol": true,
+              "emphasis": {}
+          }
+      ],
+      "legend": [
+          {
+              "data": [
+                  "\u57ce\u5e02"
+              ],
+              "selected": {
+                  "\u57ce\u5e02": true
+              },
+              "show": true,
+              "left": "left",
+              "padding": 5,
+              "itemGap": 10,
+              "itemWidth": 25,
+              "itemHeight": 14
+          }
+      ],
+      "tooltip": {
+          "show": true,
+          "trigger": "item",
+          "triggerOn": "mousemove|click",
+          "axisPointer": {
+              "type": "line"
+          },
+          "showContent": true,
+          "alwaysShowContent": false,
+          "showDelay": 0,
+          "hideDelay": 100,
+          "textStyle": {
+              "fontSize": 14
+          },
+          "borderWidth": 0,
+          "padding": 5
+      },
+      "title": [
+          {
+              "text": "\u6d59\u6c5f\u7701\u535a\u7269\u9986\u6e38\u5ba2\u6765\u6e90",
+              "left": "center",
+              "padding": 5,
+              "itemGap": 10
+          }
+      ],
+      "visualMap": {
+          "show": true,
+          "type": "continuous",
+          "min": 0,
+          "max": 100,
+          "inRange": {
+              "color": [
+                  "#50a3ba",
+                  "#eac763",
+                  "#d94e5d"
+              ]
+          },
+          "calculable": true,
+          "inverse": false,
+          "splitNumber": 5,
+          "orient": "vertical",
+          "showLabel": true,
+          "itemWidth": 20,
+          "itemHeight": 140,
+          "borderWidth": 0
+      }
+  };
+        chart_389a10b14f354985a8377f473555d931.setOption(option_389a10b14f354985a8377f473555d931);
+    </script>
+
+<script>
+    var date_person_list = {{ date_person_list|safe }};
+    var date_list = {{ date_list|safe }};
+    var chart_4aab6b2376444298badd86e0e95ec6ef = echarts.init(
+            document.getElementById('4aab6b2376444298badd86e0e95ec6ef'), 'white', {renderer: 'canvas'});
+    var option_4aab6b2376444298badd86e0e95ec6ef = {
+    "animation": true,
+    "animationThreshold": 2000,
+    "animationDuration": 1000,
+    "animationEasing": "cubicOut",
+    "animationDelay": 0,
+    "animationDurationUpdate": 300,
+    "animationEasingUpdate": "cubicOut",
+    "animationDelayUpdate": 0,
+    "series": [
+        {
+            "type": "line",
+            "name": "\u4eba\u6d41\u91cf",
+            "connectNulls": false,
+            "symbolSize": 8,
+            "showSymbol": true,
+            "smooth": false,
+            "clip": true,
+            "step": false,
+            "data": date_person_list,
+            "hoverAnimation": false,
+            "label": {
+                "show": false,
+                "position": "top",
+                "margin": 8
+            },
+            "lineStyle": {
+                "show": true,
+                "width": 1.5,
+                "opacity": 1,
+                "curveness": 0,
+                "type": "solid"
+            },
+            "areaStyle": {
+                "opacity": 0
+            },
+            "zlevel": 0,
+            "z": 0
+        }
+    ],
+    "legend": [
+        {
+            "data": [
+                "\u4eba\u6d41\u91cf"
+            ],
+            "selected": {
+                "\u4eba\u6d41\u91cf": true
+            },
+            "show": true,
+            "left": "left",
+            "padding": 5,
+            "itemGap": 10,
+            "itemWidth": 25,
+            "itemHeight": 14
+        }
+    ],
+    "tooltip": {
+        "show": true,
+        "trigger": "axis",
+        "triggerOn": "mousemove|click",
+        "axisPointer": {
+            "type": "line"
+        },
+        "showContent": true,
+        "alwaysShowContent": false,
+        "showDelay": 0,
+        "hideDelay": 100,
+        "textStyle": {
+            "fontSize": 14
+        },
+        "borderWidth": 0,
+        "padding": 5
+    },
+    "xAxis": [
+        {
+            "type": "category",
+            "show": true,
+            "scale": false,
+            "nameLocation": "end",
+            "nameGap": 15,
+            "gridIndex": 0,
+            "inverse": false,
+            "offset": 0,
+            "splitNumber": 5,
+            "boundaryGap": false,
+            "minInterval": 0,
+            "splitLine": {
+                "show": false,
+                "lineStyle": {
+                    "show": true,
+                    "width": 1,
+                    "opacity": 1,
+                    "curveness": 0,
+                    "type": "solid"
+                }
+            },
+            "data": date_list
+        }
+    ],
+    "yAxis": [
+        {
+            "name": "\u4eba\u6d41\u91cf(\u4eba/\u5929)",
+            "show": true,
+            "scale": false,
+            "nameLocation": "end",
+            "nameGap": 15,
+            "gridIndex": 0,
+            "inverse": false,
+            "offset": 0,
+            "splitNumber": 5,
+            "max": 8000,
+            "minInterval": 0,
+            "splitLine": {
+                "show": false,
+                "lineStyle": {
+                    "show": true,
+                    "width": 1,
+                    "opacity": 1,
+                    "curveness": 0,
+                    "type": "solid"
+                }
+            }
+        }
+    ],
+    "title": [
+        {
+            "text": "\u6d59\u6c5f\u7701\u535a\u7269\u9986\u4eba\u6d41\u91cf",
+            "subtext": "\u6570\u636e\u6765\u81eashiyd",
+            "left": "center",
+            "padding": 5,
+            "itemGap": 10
+        }
+    ],
+    "dataZoom": [
+        {
+            "show": true,
+            "type": "slider",
+            "realtime": true,
+            "start": 0,
+            "end": 40,
+            "orient": "horizontal",
+            "zoomLock": false,
+            "filterMode": "filter"
+        }
+    ]
+};
+        chart_4aab6b2376444298badd86e0e95ec6ef.setOption(option_4aab6b2376444298badd86e0e95ec6ef);
+</script>
+</body>
+</html>
+
+

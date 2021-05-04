@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>文物管理</title>
+  <link rel="stylesheet" href="../static/layui/css/layui.css">
+  <style>
+    .layui-body{
+      left:300px;
+      margin-top: 50px;
+    }
+    .layui-table{
+      width: 400px;
+    }
+    .layui-form-item{
+      margin-left:100px;
+    }
+  </style>
+
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+  <div class="layui-header">
+    <div class="layui-logo">后台管理系统</div>
+    <!-- 头部区域（可配合layui已有的水平导航） -->
+    
+
+    <ul class="layui-nav layui-layout-right">
+      <li class="layui-nav-item">
+        <a href="javascript:;">
+          <img src="../static/img/head.png" class="layui-nav-img">
+          {{ user.username }}
+        </a>
+        <dl class="layui-nav-child">
+          <dd><a href="">基本资料</a></dd>
+          <dd><a href="">安全设置</a></dd>
+        </dl>
+      </li>
+      <li class="layui-nav-item"><a id="logout" href="/logout/">退出</a></li>
+    </ul>
+  </div>
+  
+  <div class="layui-side layui-bg-black">
+    <div class="layui-side-scroll">
+      <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+      <ul class="layui-nav layui-nav-tree"  lay-filter="test">
+
+        <li class="layui-nav-item">
+          <a class="" href="../user_list">用户管理</a>
+        </li>
+
+        <li class="layui-nav-item layui-this">
+          <a href="../relic_list/">文物管理</a>
+        </li>
+
+        <li class="layui-nav-item layui-nav-itemed">
+          <a href="javascript:;">资源管理</a>
+          <dl class="layui-nav-child">
+            <dd><a href="../photo_list">照片管理</a></dd>
+            <dd><a href="../video_list">视频管理</a></dd>
+          </dl>
+        </li>
+
+        <li class="layui-nav-item"><a href="../data_analyse">数据分析</a></li>
+
+      </ul>
+    </div>
+  </div>
+  
+  <div class="layui-body">
+    <!-- 内容主体区域 -->
+    <button id="addrelic_btn" data-method="addrelic" type="button" class="layui-btn">
+      <i class="layui-icon">&#xe61f;</i>添加文物
+    </button>
+    <button id="deleterelic_btn" type="button" class="layui-btn">
+      <i class="layui-icon">&#xe616;</i>删除文物
+    </button>
+
+    <div id = 'hahaha'>
+    <table class="layui-table" lay-data="{height:515, width:1000,url:'', page:true, id:'test'}" lay-filter="test">
+      <thead>
+        <tr>
+          <th style="text-align: center;" lay-data="{field:'check_box', width:60}">选中</th>
+          <th align="center" lay-data="{field:'id', width:70, sort: true}">ID</th>
+          <th align="center" lay-data="{field:'relicname', width:180}">文物名称</th>
+          <th align="center" lay-data="{field:'dynamic', width:200}">朝代</th>
+          <th align="center" lay-data="{field:'relictype', width:180}">文物类型</th>
+          <th lay-data="{field:'hot', width:80, sort: true}">热度</th>
+          <!-- <th lay-data="{field:'pic', width:100}">图示</th>
+          <th lay-data="{field:'down', width:100}">模型下载</th> -->
+          <th lay-data="{field:'other', width:250}">备注</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for relic in relic_list %}
+            <tr>
+                <td id="checkbox"><input class="laytable-cell-checkbox" lay-filter="clicklisten" type="checkbox" name="" title="" lay-skin="primary"></td>
+                <td>{{ relic.id }}</td>
+                <td>{{ relic.relic_name }}</td>
+                <td>{{ relic.dynamic }}</td>
+                <td>{{ relic.type }}</td>
+                <td>{{ relic.hot }}</td>
+                <!-- <td>
+                  <a href="user_list.html" style="text-decoration:underline;">查看</a>
+                </td>
+                <td>
+                  <a href="user_list.html" style="text-decoration:underline;">下载</a>
+                </td> -->
+                <td>
+                  {% if relic.other == None %}
+                      {{ '暂无备注' }}
+                  {% else %}
+                      {{ relic.other }}
+                  {% endif %}
+                  {% empty %}
+                </td>
+            </tr>
+        {% endfor %}
+
+      </tbody>
+
+    </table>
+    </div>
+
+  </div>
+  
+  <div class="layui-footer">
+    <!-- 底部固定区域 -->
+    © yd_shi
+  </div>
+</div>
+
+<form class="layui-form" action="/add_relic/" method="post" id="addrelic" style="display:none">
+  <div class="layui-form-item" style="margin-top:20px">
+    <div class="layui-input-inline">
+      <input id='name' type="text" name="relic_name" lay-verify="required|title" autocomplete="off" placeholder="请输入文物名称" class="layui-input">
+    </div>
+  </div>
+
+  <div class="layui-form-item">
+    <div class="layui-input-inline">
+        <input id='dynamic' type="tel" name="dynamic" placeholder="请输入文物朝代" autocomplete="off" class="layui-input">
+    </div>
+  </div>
+
+    <div class="layui-form-item" style="margin-bottom: 100px">
+  <!-- <label class="layui-form-label">文物类型</label> -->
+    <div class="layui-input-inline">
+      <select name="type" lay-filter="aihao">
+        <option value=""></option>
+        <option value="金石陶瓷" selected="">金石陶瓷</option>
+        <option value="漆木竹骨">漆木竹骨</option>
+        <option value="书画碑帖">书画碑帖</option>
+        <option value="丝绸织绣">丝绸织绣</option>
+      </select>
+
+      <div class="layui-unselect layui-form-select">
+        <div class="layui-select-title">
+          <input type="text" placeholder="请选择文物类型" value="金石陶瓷" name="type" class="layui-input layui-unselect">
+          <i class="layui-edge"></i>
+        </div>
+        <dl class="layui-anim layui-anim-upbit">
+          <dd lay-value="" class="layui-select-tips">请选择文物类型</dd>
+          <dd lay-value="金石陶瓷" class="layui-this">金石陶瓷</dd>
+          <dd lay-value="漆木竹骨" class="">漆木竹骨</dd>
+          <dd lay-value="书画碑帖" class="">书画碑帖</dd>
+          <dd lay-value="丝绸织绣" class="">丝绸织绣</dd>
+      </dl>
+    </div>
+    </div>
+
+
+
+  <!-- <div class="layui-form-item">
+    <div>
+      选择文物图片：
+    </div>
+    <input id='pic' type="file" name="pic" accept="image/png, image/jpg" />
+  </div>
+
+  <div class="layui-form-item">
+    <div>
+      选择文物模型：
+    </div>
+    <input id='model' type="file" name="model" />
+  </div> -->
+</form>
+
+
+<script type="text/javascript" src="../static/layui/layui.js" charset="utf-8"></script>
+<script>
+//JavaScript代码区域
+layui.use('element', function(){
+  var element = layui.element;
+});
+
+layui.use('table', function(){
+  var table = layui.table;
+ 
+//转换静态表格
+table.init('test', {
+  height: 315 //设置高度
+  ,limit: 10 //注意：请务必确保 limit 参数（默认：10）是与你服务端限定的数据条数一致
+  //支持所有基础参数
+}); 
+});
+
+<!----------------------------------------------添加文物------------------------------------------>
+layui.use('layer', function(){ //独立版的layer无需执行这一句
+  var $ = layui.jquery, layer = layui.layer; //独立版的layer无需执行这一句
+  //触发事件
+  var active = {
+      addrelic: function(othis){
+          var type = othis.data('type');
+              layer.open({
+                type:1
+                ,area:'400px'
+                ,title: '添加文物'
+                ,content: $("#addrelic")
+                ,shade: [0.8, '#393D49']
+                ,btnAlign: 'r'
+                ,btn: ['添加', '取消']
+                ,yes: function(index, layero){
+                  $('.layui-layer-btn0').attr('lay-submit','');
+                  var $1 = $.trim($('#name').val());
+                  if($1 == ''){
+                      flag = 0;
+                      layer.msg('文物名称不能为空',function() {time:2000});
+                      return false;
+                  }
+                  else{
+                    $("#addrelic").submit();
+                  }
+                }
+                ,btn2: function(index, layero){
+                  layer.closeAll(type)
+                }
+              });
+      }
+  };
+
+  $('#addrelic_btn').on('click', function(){
+    var othis = $(this), method = othis.data('method');
+    active[method] ? active[method].call(this, othis) : '';
+  });
+
+})
+
+
+<!----------------------------------------------删除文物------------------------------------------>
+layui.use('table', function () {
+  $ = layui.jquery;
+  var table = layui.table;
+  var idList = [];
+  var nameList = [];
+  var idString = '';
+
+  <!-------------------------------批量删除文物----------------------------------->
+  $('#hahaha').on('click', '.layui-form-checkbox', function(){
+    var data = $(this).parent().parent().next().children().html();
+    if( $(this).hasClass('layui-form-checked' )){
+      idList.push(data)
+    }else{
+      idList.splice($.inArray(data,idList),1);
+    }
+  })
+
+  $('#deleterelic_btn').on('click', function(){
+      idString = idList.join(',');
+      if(idString == ''){
+        layer.alert("您未选中文物", { icon: 6, title: "提示", offset: "auto", skin: 'layui-layer-molv' });
+      }else{
+        layer.confirm("您确定删除选中文物吗", { icon: 6, title: "提示", offset: "auto", skin: 'layui-layer-molv', anim: 5 }, function (index) {
+            layer.close(index);
+            $.post("/delete_relic/", {data: idString}, function(data){
+                layer.alert("删除成功", { icon: 6, title: "提示", offset: "auto", skin: 'layui-layer-molv'}, function(){
+                    window.location.href="/relic_list/"
+                    }
+                );
+            })
+        });
+      }
+  });
+
+})
+
+
+</script>
+</body>
+</html>
+
+

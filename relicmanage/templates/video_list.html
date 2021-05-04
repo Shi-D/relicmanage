@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>视频管理</title>
+  <link rel="stylesheet" href="../static/layui/css/layui.css">
+  <style>
+    .layui-body{
+      left:300px;
+      margin-top: 50px;
+    }
+    .layui-table{
+      width: 400px;
+    }
+  </style>
+
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+  <div class="layui-header">
+    <div class="layui-logo">后台管理系统</div>
+    <!-- 头部区域（可配合layui已有的水平导航） -->
+
+
+    <ul class="layui-nav layui-layout-right">
+      <li class="layui-nav-item">
+        <a href="javascript:;">
+          <img src="../static/img/head.png" class="layui-nav-img">
+          {{ user.username }}
+        </a>
+        <dl class="layui-nav-child">
+          <dd><a href="">基本资料</a></dd>
+          <dd><a href="">安全设置</a></dd>
+        </dl>
+      </li>
+      <li class="layui-nav-item"><a id="logout" href="/logout/">退出</a></li>
+    </ul>
+  </div>
+
+  <div class="layui-side layui-bg-black">
+    <div class="layui-side-scroll">
+      <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+      <ul class="layui-nav layui-nav-tree"  lay-filter="test">
+
+        <li class="layui-nav-item">
+          <a class="" href="../user_list">用户管理</a>
+        </li>
+
+        <li class="layui-nav-item">
+          <a href="../relic_list/">文物管理</a>
+        </li>
+
+        <li class="layui-nav-item layui-nav-itemed">
+          <a href="javascript:;">资源管理</a>
+          <dl class="layui-nav-child">
+            <dd><a href="../photo_list">照片管理</a></dd>
+            <dd  class="layui-this"><a href="../video_list">视频管理</a></dd>
+          </dl>
+        </li>
+
+        <li class="layui-nav-item"><a href="../data_analyse">数据分析</a></li>
+
+      </ul>
+    </div>
+  </div>
+
+  <div class="layui-body">
+    <!-- 内容主体区域 -->
+
+    <button type="button" id="upload_video" class="layui-btn">
+      <i class="layui-icon">&#xe681;</i>导入视频
+    </button>
+    <button type="button" class="layui-btn">
+      <i class="layui-icon">&#xe601;</i>批量下载
+    </button>
+
+    <div id="table_container">
+    <table class="layui-table" lay-data="{height:515, width:1000,url:'', page:true, id:'test'}" lay-filter="test">
+      <thead>
+        <tr>
+          <th style="text-align: center;" lay-data="{field:'check_box', width:60}">选中</th>
+          <th align="center" lay-data="{field:'id', width:90, sort: true}">视频ID</th>
+          <th align="center" lay-data="{field:'relic_id', width:120, sort: true}">对应文物ID</th>
+          <th align="center" lay-data="{field:'relic_name', width:140, sort: true}">对应文物名称</th>
+          <th align="center" lay-data="{field:'time', width:200, sort: true}">上传时间</th>
+          <th lay-data="{field:'video', width:90}">视频</th>
+          <th lay-data="{field:'down', width:130}">视频下载</th>
+          <th lay-data="{field:'other', width:180}">备注</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for video in video_list %}
+        <tr>
+          <td><input type="checkbox" name="" title="" lay-skin="primary"></td>
+          <td>{{ video.id }}</td>
+          <td>{{ video.relic_id }}</td>
+          <td>{{ video.relic_name }}</td>
+          <td>{{ video.add_time }}</td>
+          <td>
+            <a href="http://127.0.0.1:8000/media/{{ video.video }}" style="text-decoration:underline;">
+              <button id="look" type="button" class="layui-btn layui-btn-sm">
+                <i class="layui-icon">&#xe6ed;</i>
+              </button>
+            </a>
+          </td>
+          <td>
+<!--            <label style="display:none;">http://127.0.0.1:8000/media/{{ video.video }}</label>-->
+            <a href="http://127.0.0.1:8000/media/{{ video.video }}" download="http://127.0.0.1:8000/media/{{ video.video }}">
+              <button id="down" type="button" class="layui-btn layui-btn-sm">
+                <i class="layui-icon">&#xe601;</i>
+              </button>
+            </a>
+          </td>
+          <td> </td>
+        </tr>
+        {% endfor %}
+
+
+      </tbody>
+    </table>
+    </div>
+
+    </div>
+
+  <div class="layui-footer">
+    <!-- 底部固定区域 -->
+    © yd_shi
+  </div>
+</div>
+
+<script type="text/javascript" src="../static/layui/layui.js" charset="utf-8"></script>
+<script>
+//JavaScript代码区域
+
+layui.use('element', function(){
+  var element = layui.element;
+});
+
+layui.use('table', function(){
+  var table = layui.table;
+  //转换静态表格
+  table.init('test', {
+    height: 315 //设置高度
+    ,limit: 10 //注意：请务必确保 limit 参数（默认：10）是与你服务端限定的数据条数一致
+    //支持所有基础参数
+  });
+});
+
+layui.use('upload', function(){
+  var $ = layui.jquery
+  ,upload = layui.upload;
+
+  upload.render({
+      elem: '#upload_video'
+      ,url: '/upload_video/'
+      ,multiple: true
+      ,accept: 'video'
+      ,field : 'video'
+      ,done: function(res){
+        layer.alert("导入成功", { icon: 6, title: "提示", offset: "auto", skin: 'layui-layer-molv'}, function(){
+            window.location.href="/video_list/"
+            }
+        );
+      }
+    });
+
+})
+
+
+
+layui.use('table', function () {
+  $ = layui.jquery;
+  $('#table_container').on('click', '#down', function(){
+    var url = $(this).parent().children().html();
+    var data = $(this).parent();
+    console.log(url);
+    console.log(data);
+    window.open(url);
+
+  })
+
+})
+
+</script>
+</body>
+</html>
+
+
